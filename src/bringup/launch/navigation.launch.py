@@ -11,9 +11,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     pkg_share = get_package_share_directory('bringup')
 
-    rviz_flag = LaunchConfiguration('rviz')
-    map_yaml = LaunchConfiguration('map')
-    nav2_params = LaunchConfiguration('nav2_params')
+    nav2_params = os.path.join(pkg_share, "config", "nav2_params.yaml")
 
     xfer_format = 1
     multi_topic = 0
@@ -37,22 +35,6 @@ def generate_launch_description():
         {"cmdline_input_bd_code": cmdline_bd_code},
     ]
 
-    declare_rviz_arg = DeclareLaunchArgument(
-        'rviz',
-        default_value='true',
-        description='Whether to start RViz2',
-    )
-    declare_map_arg = DeclareLaunchArgument(
-        'map',
-        default_value=os.path.join(pkg_share, 'config', 'map.yaml'),
-        description='Full path to the Nav2 occupancy map yaml file',
-    )
-    declare_nav2_params_arg = DeclareLaunchArgument(
-        'nav2_params',
-        default_value=os.path.join(pkg_share, 'config', 'nav2_params.yaml'),
-        description='Full path to the Nav2 parameter file',
-    )
-
     livox_driver = Node(
         package='livox_ros_driver2',
         executable='livox_ros_driver2_node',
@@ -63,8 +45,8 @@ def generate_launch_description():
 
     super_lio_node = Node(
         package='super_lio',
-        executable='relocation_node',
-        name='relocation_node',
+        executable='super_lio_node',
+        name='super_lio_node',
         output='screen',
         parameters=[os.path.join(pkg_share, 'config', 'mid360.yaml')],
     )
@@ -98,7 +80,7 @@ def generate_launch_description():
         executable='map_server',
         name='map_server',
         output='screen',
-        parameters=[nav2_params, {'yaml_filename': map_yaml}],
+        parameters=[nav2_params, {'yaml_filename': 'map.yaml'}],
     )
 
     planner_server = Node(
@@ -165,13 +147,10 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='log',
-        condition=IfCondition(rviz_flag),
+        arguments=["-d", os.path.join(pkg_share, "rviz", "nav.rviz")],
     )
 
     return LaunchDescription([
-        declare_rviz_arg,
-        declare_map_arg,
-        declare_nav2_params_arg,
         livox_driver,
         super_lio_node,
         map_to_odom_tf,

@@ -5,7 +5,7 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    pkg_share = FindPackageShare(package="agv_bringup").find("agv_bringup")
+    pkg_share = FindPackageShare(package="bringup").find("bringup")
     ################### user configure parameters for ros2 start ###################
     xfer_format = 1  # 0-Pointcloud2(PointXYZRTL), 1-customized pointcloud format
     multi_topic = 0  # 0-All LiDARs share the same topic, 1-One LiDAR one topic
