@@ -12,6 +12,7 @@ def generate_launch_description():
     pkg_share = get_package_share_directory('bringup')
 
     nav2_params = os.path.join(pkg_share, "config", "nav2_params.yaml")
+    map_yaml = os.path.join(pkg_share, "config", "map.yaml")
 
     xfer_format = 1
     multi_topic = 0
@@ -80,7 +81,7 @@ def generate_launch_description():
         executable='map_server',
         name='map_server',
         output='screen',
-        parameters=[nav2_params, {'yaml_filename': 'map.yaml'}],
+        parameters=[nav2_params, {'yaml_filename': map_yaml}],
     )
 
     planner_server = Node(
