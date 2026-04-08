@@ -19,7 +19,7 @@ def generate_launch_description():
     data_src = 0
     publish_freq = 10.0
     output_type = 0
-    frame_id = 'base_link'
+    frame_id = 'livox_frame'
     lvx_file_path = '/home/livox/livox_test.lvx'
     cmdline_bd_code = 'livox0000000001'
     user_config_path = os.path.join(pkg_share, 'config', 'MID360_config.json')
@@ -59,13 +59,24 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom'],
     )
 
+    livox_to_base_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='livox_to_base_tf',
+        arguments=[
+            '0', '0', '0',
+            '1.57079632679', '0', '0',
+            'livox_frame', 'base_link',
+        ],
+    )
+
     pointcloud_to_laserscan_node = Node(
         package='pointcloud_to_laserscan',
         executable='pointcloud_to_laserscan_node',
         name='pointcloud_to_laserscan',
         remappings=[('cloud_in', '/lio/cloud_world'), ('scan', '/scan')],
         parameters=[{
-            "target_frame": "base_link",
+            "target_frame": "livox_frame",
             "transform_tolerance": 0.2,
             "min_height": 0.0,
             "max_height": 0.6,
@@ -162,6 +173,7 @@ def generate_launch_description():
         livox_driver,
         super_lio_node,
         map_to_odom_tf,
+        livox_to_base_tf,
         pointcloud_to_laserscan_node,
         map_server,
         planner_server,

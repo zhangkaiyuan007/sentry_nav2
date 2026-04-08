@@ -618,7 +618,7 @@ void ROSWrapper::pub_odom(const NavState& state){
 
   tf_msg.header.stamp = odom.header.stamp;
   tf_msg.header.frame_id = "odom";
-  tf_msg.child_frame_id = "base_link";
+  tf_msg.child_frame_id = "livox_frame";
 
   tf_msg.transform.translation.x = state.p[0];
   tf_msg.transform.translation.y = state.p[1];
