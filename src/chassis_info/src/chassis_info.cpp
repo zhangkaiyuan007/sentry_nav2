@@ -1,4 +1,4 @@
-#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
 
@@ -10,12 +10,12 @@ public:
     sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "/cmd_vel", 10, [this](geometry_msgs::msg::Twist::SharedPtr msg) {
         std::lock_guard<std::mutex> lock(mutex_);
-        v_ = msg->linear.x;
-        yaw_ = msg->angular.z;
+        v_ = msg->linear.x*330.0;
+        yaw_ = msg->angular.z*0.001;
       });
 
     chassis_info_pub_ =
-      this->create_publisher<geometry_msgs::msg::TwistStamped>("/chassis_info", 10);
+      this->create_publisher<geometry_msgs::msg::Twist>("/chassis_info", 10);
 
     timer_ = this->create_wall_timer(
       std::chrono::milliseconds(50),
@@ -25,13 +25,11 @@ public:
 private:
   void timer_callback()
   {
-    auto msg = geometry_msgs::msg::TwistStamped();
-    msg.header.stamp = this->now();
-    msg.header.frame_id = "base_link";
+    auto msg = geometry_msgs::msg::Twist();
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      msg.twist.linear.x = v_;
-      msg.twist.linear.y = yaw_;
+      msg.linear.x = v_;
+      msg.linear.y = yaw_;
     }
     chassis_info_pub_->publish(msg);
   }
@@ -42,7 +40,7 @@ private:
 
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr sub_;
   rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr chassis_info_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr chassis_info_pub_;
 };
 
 int main(int argc, char * argv[])

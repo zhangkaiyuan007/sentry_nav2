@@ -143,6 +143,13 @@ def generate_launch_description():
         }],
     )
 
+    chassis_info_node = Node(
+        package='chassis_info',
+        executable='chassis_info_node',
+        name='chassis_info_node',
+        output='screen'
+    )
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -163,5 +170,6 @@ def generate_launch_description():
         bt_navigator,
         lifecycle_manager_localization,
         lifecycle_manager_navigation,
+        chassis_info_node,
         rviz_node,
     ])
